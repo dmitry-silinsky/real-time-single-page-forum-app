@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\{Model, Relations};
+use Eloquent;
+use Illuminate\Database\Eloquent\{Builder, Collection, Model, Relations};
+use Illuminate\Support\Carbon;
+use Str;
 
 /**
  * App\Models\Question
@@ -13,27 +16,36 @@ use Illuminate\Database\Eloquent\{Model, Relations};
  * @property string $body
  * @property int $category_id
  * @property int $user_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Category $category
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Reply[] $replies
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereBody($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereSlug($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Question whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read string $path
+ * @property-read Category $category
+ * @property-read Collection|Reply[] $replies
+ * @property-read User $user
+ * @method static Builder|Question newModelQuery()
+ * @method static Builder|Question newQuery()
+ * @method static Builder|Question query()
+ * @method static Builder|Question whereBody($value)
+ * @method static Builder|Question whereCategoryId($value)
+ * @method static Builder|Question whereCreatedAt($value)
+ * @method static Builder|Question whereId($value)
+ * @method static Builder|Question whereSlug($value)
+ * @method static Builder|Question whereTitle($value)
+ * @method static Builder|Question whereUpdatedAt($value)
+ * @method static Builder|Question whereUserId($value)
+ * @mixin Eloquent
  */
 class Question extends Model
 {
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    /**
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     /**
      * @return Relations\BelongsTo
@@ -57,5 +69,24 @@ class Question extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPathAttribute()
+    {
+        return asset("/api/question/{$this->slug}");
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (self $question) {
+            if (empty($question->slug) && $question->title) {
+                $question->slug = Str::slug($question->title);
+            }
+        });
     }
 }
