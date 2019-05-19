@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\{Model, Relations};
+use DomainException;
+use Eloquent;
+use Illuminate\Database\Eloquent\{Builder, Collection, Model, Relations};
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Reply
@@ -11,21 +14,21 @@ use Illuminate\Database\Eloquent\{Model, Relations};
  * @property string $body
  * @property int $question_id
  * @property int $user_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Like[] $likes
- * @property-read \App\Models\Question $question
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereBody($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereQuestionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply whereUserId($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|Like[] $likes
+ * @property-read Question $question
+ * @property-read User $user
+ * @method static Builder|Reply newModelQuery()
+ * @method static Builder|Reply newQuery()
+ * @method static Builder|Reply query()
+ * @method static Builder|Reply whereBody($value)
+ * @method static Builder|Reply whereCreatedAt($value)
+ * @method static Builder|Reply whereId($value)
+ * @method static Builder|Reply whereQuestionId($value)
+ * @method static Builder|Reply whereUpdatedAt($value)
+ * @method static Builder|Reply whereUserId($value)
+ * @mixin Eloquent
  */
 class Reply extends Model
 {
@@ -53,5 +56,32 @@ class Reply extends Model
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+
+    /**
+     * @param User $user
+     * @return void
+     * @throws DomainException
+     */
+    public function like(User $user)
+    {
+        if ($this->likes()->where('user_id', $user->id)->first()) {
+            throw new DomainException('This reply already liked this user');
+        }
+
+        $this->likes()->create(['user_id' => $user->id]);
+    }
+
+    /**
+     * @param User $user
+     * @return void
+     */
+    public function unlike(User $user)
+    {
+        if (! $this->likes()->where('user_id', $user->id)->first()) {
+            throw new DomainException('Like of this user not found');
+        }
+
+        $this->likes()->where('user_id', $user->id)->delete();
     }
 }

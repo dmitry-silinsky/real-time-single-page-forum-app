@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Replies\{CreateRequest, UpdateRequest};
 use App\Http\Resources\ReplyResource;
-use App\Models\Question;
+use App\Models\{Question, Reply, User};
 use Auth;
 use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\{JsonResponse, Resources\Json\AnonymousResourceCollection, Response};
 
 class ReplyController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth')->only('store', 'update', 'destroy');
+        $this->middleware('auth')->only('store', 'update', 'destroy', 'like', 'unlike');
     }
 
     /**
@@ -82,10 +83,10 @@ class ReplyController extends Controller
      * Remove the specified resource from storage.
      *
      * @param Question $question
-     * @param $reply
+     * @param int $reply
      * @return Response
      */
-    public function destroy(Question $question, $reply)
+    public function destroy(Question $question, int $reply)
     {
         $reply = $question->replies()->findOrFail($reply);
 
@@ -95,5 +96,35 @@ class ReplyController extends Controller
         } catch (Exception $exception) {
             return response('Error while deleting', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * @param Question $question
+     * @param int $reply
+     * @return ResponseFactory|Response
+     */
+    public function like(Question $question, int $reply)
+    {
+        /** @var Reply $reply */
+        $reply = $question->replies()->findOrFail($reply);
+
+        $reply->like(auth()->user());
+
+        return response(null, Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @param Question $question
+     * @param int $reply
+     * @return ResponseFactory|Response
+     */
+    public function unlike(Question $question, int $reply)
+    {
+        /** @var Reply $reply */
+        $reply = $question->replies()->findOrFail($reply);
+
+        $reply->unlike(auth()->user());
+
+        return response(null, Response::HTTP_ACCEPTED);
     }
 }
