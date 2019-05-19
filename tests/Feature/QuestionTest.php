@@ -17,8 +17,6 @@ class QuestionTest extends TestCase
      */
     public function testIndexSuccess()
     {
-        $this->withoutExceptionHandling();
-
         $this->getJson(route('question.index'))->assertStatus(Response::HTTP_OK);
     }
 

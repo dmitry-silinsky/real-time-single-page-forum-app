@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Questions;
+namespace App\Http\Requests\Question;
 
-use App\Models\Question;
+use App\Models\Category;
 use Auth;
 
 /**
- * Question Update Request
+ * Category Update Request
  *
- * @property-read Question $question
+ * @property-read Category $question
  */
 class UpdateRequest extends CreateRequest
 {

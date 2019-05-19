@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Questions\{CreateRequest, UpdateRequest};
+use App\Http\Requests\Question\{CreateRequest, UpdateRequest};
 use App\Http\Resources\QuestionResource;
 use App\Models\{Question, User};
 use Auth;
