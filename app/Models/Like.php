@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, Relations};
 
 /**
  * App\Models\Like
@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Reply $reply
+ * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Like newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Like newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Like query()
@@ -24,5 +26,21 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Like extends Model
 {
-    //
+    protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    /**
+     * @return Relations\BelongsTo
+     */
+    public function reply()
+    {
+        return $this->belongsTo(Reply::class);
+    }
+
+    /**
+     * @return Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

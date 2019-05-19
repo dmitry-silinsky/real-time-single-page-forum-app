@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, Relations};
 
 /**
  * App\Models\Reply
@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Like[] $likes
+ * @property-read \App\Models\Question $question
+ * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Reply query()
@@ -26,5 +29,29 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Reply extends Model
 {
-    //
+    protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    /**
+     * @return Relations\BelongsTo
+     */
+    public function question()
+    {
+        return $this->belongsTo(Question::class);
+    }
+
+    /**
+     * @return Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return Relations\HasMany
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 }
