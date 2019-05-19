@@ -53,7 +53,7 @@ class CategoryTest extends TestCase
     public function testUpdateSuccess()
     {
         $this->withoutExceptionHandling();
-        
+
         /** @var Category $category */
         $category = factory(Category::class)->create();
 
@@ -78,6 +78,8 @@ class CategoryTest extends TestCase
     {
         /** @var Category $category */
         $category = factory(Category::class)->create();
+
+        $this->actingAs(factory(User::class)->create());
 
         $this->deleteJson(route('category.destroy', $category))->assertStatus(Response::HTTP_NO_CONTENT);
 

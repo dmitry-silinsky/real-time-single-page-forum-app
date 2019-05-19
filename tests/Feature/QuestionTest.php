@@ -90,6 +90,8 @@ class QuestionTest extends TestCase
         /** @var Question $question */
         $question = factory(Question::class)->create();
 
+        $this->actingAs(factory(User::class)->create());
+
         $this->deleteJson(route('question.destroy', $question))->assertStatus(Response::HTTP_NO_CONTENT);
 
         $this->assertNull(Question::find($question->slug));

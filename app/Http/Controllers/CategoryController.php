@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Category\CreateRequest;
-use App\Http\Requests\Category\UpdateRequest;
+use App\Http\Requests\Category\{CreateRequest, UpdateRequest};
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\{Request, Response};
+use Illuminate\Http\{JsonResponse, Resources\Json\AnonymousResourceCollection, Response};
 
 class CategoryController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth')->only('store', 'update');
+        $this->middleware('auth')->only('store', 'update', 'destroy');
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return Category[]|Collection
+     * @return AnonymousResourceCollection
      */
     public function index()
     {
-        return Category::all();
+        return CategoryResource::collection(Category::all());
     }
 
     /**
@@ -43,11 +42,11 @@ class CategoryController extends Controller
      * Display the specified resource.
      *
      * @param Category $category
-     * @return Category
+     * @return CategoryResource
      */
     public function show(Category $category)
     {
-        return $category;
+        return new CategoryResource($category);
     }
 
     /**
@@ -55,13 +54,15 @@ class CategoryController extends Controller
      *
      * @param UpdateRequest $request
      * @param Category $category
-     * @return Category
+     * @return JsonResponse
      */
     public function update(UpdateRequest $request, Category $category)
     {
         $category->update($request->all());
 
-        return response($category->toArray(), Response::HTTP_ACCEPTED);
+        return (new CategoryResource($category->fresh()))
+            ->response()
+            ->setStatusCode(Response::HTTP_ACCEPTED);
     }
 
     /**

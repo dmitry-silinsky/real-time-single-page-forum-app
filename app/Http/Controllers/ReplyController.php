@@ -2,84 +2,98 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reply;
-use Illuminate\Http\Request;
+use App\Http\Requests\Replies\{CreateRequest, UpdateRequest};
+use App\Http\Resources\ReplyResource;
+use App\Models\Question;
+use Auth;
+use Exception;
+use Illuminate\Http\{JsonResponse, Resources\Json\AnonymousResourceCollection, Response};
 
 class ReplyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth')->only('store', 'update', 'destroy');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Question $question
+     * @return AnonymousResourceCollection
      */
-    public function create()
+    public function index(Question $question)
     {
-        //
+        $replies = $question->replies()->latest()->get();
+
+        return ReplyResource::collection($replies);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param CreateRequest $request
+     * @param Question $question
+     * @return ReplyResource
      */
-    public function store(Request $request)
+    public function store(CreateRequest $request, Question $question)
     {
-        //
+        $data = array_merge($request->validated(), ['user_id' => Auth::id()]);
+
+        $reply = $question->replies()->create($data);
+
+        return new ReplyResource($reply);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Reply  $reply
-     * @return \Illuminate\Http\Response
+     * @param Question $question
+     * @param int $reply
+     * @return ReplyResource
      */
-    public function show(Reply $reply)
+    public function show(Question $question, int $reply)
     {
-        //
-    }
+        $reply = $question->replies()->findOrFail($reply);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Reply  $reply
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Reply $reply)
-    {
-        //
+        return new ReplyResource($reply);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Reply  $reply
-     * @return \Illuminate\Http\Response
+     * @param UpdateRequest $request
+     * @param Question $question
+     * @param int $reply
+     * @return JsonResponse
      */
-    public function update(Request $request, Reply $reply)
+    public function update(UpdateRequest $request, Question $question, int $reply)
     {
-        //
+        $reply = $question->replies()->findOrFail($reply);
+
+        $reply->update($request->validated());
+
+        return (new ReplyResource($reply->fresh()))
+            ->response()
+            ->setStatusCode(Response::HTTP_ACCEPTED);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Reply  $reply
-     * @return \Illuminate\Http\Response
+     * @param Question $question
+     * @param $reply
+     * @return Response
      */
-    public function destroy(Reply $reply)
+    public function destroy(Question $question, $reply)
     {
-        //
+        $reply = $question->replies()->findOrFail($reply);
+
+        try {
+            $reply->delete();
+            return response(null, Response::HTTP_NO_CONTENT);
+        } catch (Exception $exception) {
+            return response('Error while deleting', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
