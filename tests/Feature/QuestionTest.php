@@ -37,16 +37,16 @@ class QuestionTest extends TestCase
     {
         /** @var Category $category */
         $category = Category::inRandomOrder()->first();
-        /** @var User $user */
-        $user = factory(User::class)->create();
 
-        $this->actingAs($user);
-
-        $response = $this->postJson(route('question.store'), [
-            'title' => $title = $this->faker->sentence,
-            'body' => $body = $this->faker->text,
-            'category_id' => $category->id,
-        ]);
+        $response = $this->postJson(
+            route('question.store'),
+            [
+                'title' => $title = $this->faker->sentence,
+                'body' => $body = $this->faker->text,
+                'category_id' => $category->id,
+            ],
+            ['Authorization' => "Bearer {$this->getToken()}"]
+        );
         $response->assertStatus(Response::HTTP_CREATED);
 
         $question = Question::whereTitle($title)->first();
@@ -55,7 +55,6 @@ class QuestionTest extends TestCase
         $this->assertEquals(Str::slug($title), $question->slug);
         $this->assertEquals($body, $question->body);
         $this->assertTrue($question->category->is($category));
-        $this->assertTrue($question->user->is($user));
     }
 
     /**
@@ -65,12 +64,14 @@ class QuestionTest extends TestCase
     {
         $question = factory(Question::class)->create();
 
-        $this->actingAs($question->user);
-
-        $response = $this->putJson(route('question.update', $question), [
-            'title' => $title = $this->faker->sentence,
-            'body' => $body = $this->faker->text,
-        ]);
+        $response = $this->putJson(
+            route('question.update', $question),
+            [
+                'title' => $title = $this->faker->sentence,
+                'body' => $body = $this->faker->text,
+            ],
+            ['Authorization' => "Bearer {$this->getToken($question->user)}"]
+        );
         $response->assertStatus(Response::HTTP_ACCEPTED);
 
         $question = Question::whereTitle($title)->first();
@@ -90,10 +91,31 @@ class QuestionTest extends TestCase
         /** @var Question $question */
         $question = factory(Question::class)->create();
 
-        $this->actingAs(factory(User::class)->create());
-
-        $this->deleteJson(route('question.destroy', $question))->assertStatus(Response::HTTP_NO_CONTENT);
+        $response = $this->deleteJson(
+            route('question.destroy', $question),
+            [],
+            ['Authorization' => "Bearer {$this->getToken()}"]
+        );
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
 
         $this->assertNull(Question::find($question->slug));
+    }
+
+    /**
+     * @param User|null $user
+     * @param string $password
+     * @return bool|string
+     */
+    private function getToken(User $user = null, string $password = 'password')
+    {
+        if ($user) {
+            return auth('api')->attempt(['email' => $user->email, 'password' => $password]);
+        }
+
+        factory(User::class)->create([
+            'email' => $email = $this->faker->email,
+            'password' => $password
+        ]);
+        return auth('api')->attempt(['email' => $email, 'password' => $password]);
     }
 }

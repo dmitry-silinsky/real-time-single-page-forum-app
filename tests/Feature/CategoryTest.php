@@ -36,9 +36,11 @@ class CategoryTest extends TestCase
      */
     public function testStoreSuccess()
     {
-        $this->actingAs(factory(User::class)->create());
-
-        $response = $this->postJson(route('category.store'), ['name' => $name = $this->faker->sentence]);
+        $response = $this->postJson(
+            route('category.store'),
+            ['name' => $name = $this->faker->sentence],
+            ['Authorization' => "Bearer {$this->getToken()}"]
+        );
         $response->assertStatus(Response::HTTP_CREATED);
 
         $category = Category::whereName($name)->first();
@@ -52,16 +54,13 @@ class CategoryTest extends TestCase
      */
     public function testUpdateSuccess()
     {
-        $this->withoutExceptionHandling();
-
         /** @var Category $category */
         $category = factory(Category::class)->create();
 
-        $this->actingAs(factory(User::class)->create());
-
         $response = $this->putJson(
             route('category.update', $category),
-            ['name' => $name = $this->faker->sentence]
+            ['name' => $name = $this->faker->sentence],
+            ['Authorization' => "Bearer {$this->getToken()}"]
         );
         $response->assertStatus(Response::HTTP_ACCEPTED);
 
@@ -79,10 +78,26 @@ class CategoryTest extends TestCase
         /** @var Category $category */
         $category = factory(Category::class)->create();
 
-        $this->actingAs(factory(User::class)->create());
-
-        $this->deleteJson(route('category.destroy', $category))->assertStatus(Response::HTTP_NO_CONTENT);
+        $this
+            ->deleteJson(
+                route('category.destroy', $category),
+                [],
+                ['Authorization' => "Bearer {$this->getToken()}"]
+            )
+            ->assertStatus(Response::HTTP_NO_CONTENT);
 
         $this->assertNull(Category::find($category->slug));
+    }
+
+    /**
+     * @return bool|string
+     */
+    private function getToken()
+    {
+        factory(User::class)->create([
+            'email' => $email = $this->faker->email,
+            'password' => $password = $this->faker->password(6)
+        ]);
+        return auth('api')->attempt(['email' => $email, 'password' => $password]);
     }
 }

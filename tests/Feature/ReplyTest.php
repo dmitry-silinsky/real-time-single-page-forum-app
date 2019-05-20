@@ -45,11 +45,13 @@ class ReplyTest extends TestCase
         /** @var Question $question */
         $question = factory(Question::class)->create();
 
-        $this->actingAs(factory(User::class)->create());
-
-        $response = $this->postJson(route('question.reply.store', $question), [
-            'body' => $body = $this->faker->text,
-        ]);
+        $response = $this->postJson(
+            route('question.reply.store', $question),
+            [
+                'body' => $body = $this->faker->text,
+            ],
+            ['Authorization' => "Bearer {$this->getToken()}"]
+        );
         $response->assertStatus(Response::HTTP_CREATED);
 
         $question->refresh();
@@ -74,11 +76,11 @@ class ReplyTest extends TestCase
             'user_id' => $user,
         ]);
 
-        $this->actingAs($user);
-
-        $response = $this->putJson(route('question.reply.update', [$question, $reply]), [
-            'body' => $body = $this->faker->text,
-        ]);
+        $response = $this->putJson(
+            route('question.reply.update', [$question, $reply]),
+            ['body' => $body = $this->faker->text],
+            ['Authorization' => "Bearer {$this->getToken($user)}"]
+        );
         $response->assertStatus(Response::HTTP_ACCEPTED);
 
         $question->refresh();
@@ -94,13 +96,33 @@ class ReplyTest extends TestCase
         $question = factory(Question::class)->create();
         $reply = factory(Reply::class)->create(['question_id' => $question]);
 
-        $this->actingAs(factory(User::class)->create());
-
-        $response = $this->deleteJson(route('question.reply.destroy', [$question, $reply]));
+        $response = $this->deleteJson(
+            route('question.reply.destroy', [$question, $reply]),
+            [],
+            ['Authorization' => "Bearer {$this->getToken($reply->user)}"]
+        );
         $response->assertStatus(Response::HTTP_NO_CONTENT);
 
         $reply = Reply::find($reply->id);
         $this->assertNull($reply);
         $this->assertEmpty($question->refresh()->replies);
+    }
+
+    /**
+     * @param User|null $user
+     * @param string $password
+     * @return bool|string
+     */
+    private function getToken(User $user = null, string $password = 'password')
+    {
+        if ($user) {
+            return auth('api')->attempt(['email' => $user->email, 'password' => $password]);
+        }
+
+        factory(User::class)->create([
+            'email' => $email = $this->faker->email,
+            'password' => $password
+        ]);
+        return auth('api')->attempt(['email' => $email, 'password' => $password]);
     }
 }

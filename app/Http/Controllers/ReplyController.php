@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Replies\{CreateRequest, UpdateRequest};
 use App\Http\Resources\ReplyResource;
-use App\Models\{Question, Reply, User};
+use App\Models\{Question, Reply};
 use Auth;
 use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -14,7 +14,7 @@ class ReplyController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth')->only('store', 'update', 'destroy', 'like', 'unlike');
+        $this->middleware('jwt')->only('store', 'update', 'destroy', 'like', 'unlike');
     }
 
     /**
