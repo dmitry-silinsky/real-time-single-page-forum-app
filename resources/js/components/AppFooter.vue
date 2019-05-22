@@ -1,7 +1,8 @@
 <template>
-    <v-footer class="pa-3">
-        <v-spacer></v-spacer>
-        <div>&copy; {{ new Date().getFullYear() }}</div>
+    <v-footer class="pa-3" fixed height="auto">
+        <v-layout justify-center row wrap>
+            <v-flex text-xs-center>&copy; {{ new Date().getFullYear() }} - <strong>Single Page Forum</strong></v-flex>
+        </v-layout>
     </v-footer>
 </template>
 
