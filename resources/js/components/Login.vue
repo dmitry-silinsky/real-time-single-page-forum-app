@@ -2,7 +2,7 @@
     <v-container fluid fill-height>
         <v-layout align-center justify-center>
             <v-flex xs12 sm8 md4>
-                <v-form ref="form" @submit.prevent="submit">
+                <v-form ref="form" @submit.prevent="login">
                     <v-text-field
                             type="email"
                             v-model="form.email"
@@ -34,23 +34,15 @@
             return {
                 valid: true,
                 form: {
-                    email: null,
-                    password: null
+                    email: 'cheyanne.robel@example.com',
+                    password: 'password'
                 }
             }
         },
         methods: {
-            submit() {
+            login() {
                 if (this.$validator.validateAll()) {
-                    axios.post('/api/auth/login', this.form)
-                        .then(response => {
-                            console.log(response.data)
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                console.log(error.response.data)
-                            }
-                        })
+                    User.login(this.form)
                 }
             }
         }
