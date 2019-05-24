@@ -11,7 +11,3 @@
         name: "Footer"
     }
 </script>
-
-<style scoped>
-
-</style>

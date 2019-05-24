@@ -9,7 +9,7 @@
 <script>
     import Toolbar from './Toolbar'
     import AppFooter from './AppFooter'
-    import Login from './Login'
+    import Login from './auth/Login'
 
     export default {
         components: {
@@ -19,7 +19,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-</style>

@@ -10,6 +10,8 @@ Vue.use(VeeValidate)
 import User from './helpers/User'
 window.User = User
 
+window.EventBus = new Vue()
+
 import router from './router'
 
 import Home from './components/Home'
