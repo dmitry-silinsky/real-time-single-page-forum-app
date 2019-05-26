@@ -23,10 +23,18 @@ class QuestionResource extends JsonResource
     {
         return [
             'title' => $this->resource->title,
+            'slug' => $this->resource->slug,
             'path' => $this->resource->path,
             'body' => $this->resource->body,
             'created_at' => $this->resource->created_at->diffForHumans(),
-            'user' => $this->resource->user->name,
+            'user' => [
+                'id' => $this->resource->user->id,
+                'name' => $this->resource->user->name,
+            ],
+            'category' => [
+                'id' => $this->resource->category->id,
+                'name' => $this->resource->category->name,
+            ],
         ];
     }
 }

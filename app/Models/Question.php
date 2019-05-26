@@ -76,7 +76,7 @@ class Question extends Model
      */
     public function getPathAttribute()
     {
-        return asset("/api/question/{$this->slug}");
+        return "/question/{$this->slug}";
     }
 
     /**
@@ -95,10 +95,6 @@ class Question extends Model
         parent::boot();
 
         static::creating(function (self $question) {
-            $question->setSlug();
-        });
-
-        static::updating(function (self $question) {
             $question->setSlug();
         });
     }

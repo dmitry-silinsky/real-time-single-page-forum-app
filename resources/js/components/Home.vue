@@ -1,7 +1,9 @@
 <template>
     <div>
         <toolbar></toolbar>
-        <router-view></router-view>
+        <v-container fluid fill-height>
+            <router-view></router-view>
+        </v-container>
         <app-footer></app-footer>
     </div>
 </template>
