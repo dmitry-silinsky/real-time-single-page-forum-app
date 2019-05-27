@@ -1,18 +1,19 @@
 <template>
-    <div>
+    <v-layout>
         <v-flex xs8>
             <question v-for="question in questions"
                       :question="question"
                       :key="question.path"></question>
         </v-flex>
-        <v-flex xs4>
-            sidebar
+        <v-flex xs4 class="ml-4">
+            <app-sidebar></app-sidebar>
         </v-flex>
-    </div>
+    </v-layout>
 </template>
 
 <script>
     import Question from './Question'
+    import AppSidebar from './AppSidebar'
 
     export default {
         data() {
@@ -20,9 +21,7 @@
                 questions: []
             }
         },
-        components: {
-            Question
-        },
+        components: { Question, AppSidebar },
         methods: {
             async getAllQuestions() {
                 try {

@@ -9,7 +9,7 @@ import SignUp from './components/auth/SignUp'
 import ForumIndex from './components/forum/Index'
 import ForumRead from './components/forum/Read'
 import CreateQuestion from './components/forum/Create'
-import Category from './components/forum/Category'
+import CreateCategory from './components/forum/category/Create'
 
 const routes = [
     { path: '/login', component: Login, name: 'login', meta: { auth: false } },
@@ -18,7 +18,7 @@ const routes = [
     { path: '/forum', component: ForumIndex, name: 'forum.index', meta: { auth: true } },
     { path: '/question/:slug', component: ForumRead, name: 'forum.read', meta: { auth: true } },
     { path: '/ask', component: CreateQuestion, name: 'forum.ask', meta: { auth: true } },
-    { path: '/category', component: Category, name: 'forum.category', meta: { auth: true } }
+    { path: '/category', component: CreateCategory, name: 'forum.category.create', meta: { auth: true } }
 ]
 
 const router = new VueRouter({

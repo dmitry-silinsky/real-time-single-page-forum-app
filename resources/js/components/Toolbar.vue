@@ -4,7 +4,7 @@
         <v-toolbar-title>Single Page Forum</v-toolbar-title>
         <v-spacer></v-spacer>
         <div class="hidden-sm-and-down">
-            <router-link v-for="(item, i) in items"
+            <router-link v-for="(item, i) in itemsByRole"
                          :key="i"
                          :to="item.to"
                          v-if="item.show">
@@ -19,12 +19,22 @@
         data() {
             return {
                 items: [
-                    { id: 'forum', title: 'Forum', to: '/forum', show: false },
-                    { id: 'ask', title: 'Ask question', to: '/ask', show: false },
-                    { id: 'category', title: 'Category', to: '/category', show: false },
-                    { id: 'login', title: 'Login', to: '/login', show: false },
-                    { id: 'logout', title: 'Logout', to: '/logout', show: false }
+                    { id: 'forum', title: 'Forum', to: '/forum', show: false, admin: false },
+                    { id: 'ask', title: 'Ask question', to: '/ask', show: false, admin: false },
+                    { id: 'category', title: 'Category', to: '/category', show: false, admin: true },
+                    { id: 'login', title: 'Login', to: '/login', show: false, admin: false },
+                    { id: 'logout', title: 'Logout', to: '/logout', show: false, admin: false }
                 ]
+            }
+        },
+        computed: {
+            itemsByRole() {
+                return this.items.filter(item => {
+                    if (item.admin && !User.isAdmin()) {
+                        return false
+                    }
+                    return true
+                })
             }
         },
         methods: {
