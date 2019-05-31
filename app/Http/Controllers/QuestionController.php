@@ -23,7 +23,7 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        $questions = Question::latest()->get();
+        $questions = Question::with('replies')->latest()->get();
 
         return QuestionResource::collection($questions);
     }

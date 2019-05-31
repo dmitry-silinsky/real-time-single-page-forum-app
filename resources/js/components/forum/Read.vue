@@ -1,16 +1,22 @@
 <template>
-    <v-layout>
+    <div>
         <edit v-if="editing" :question="question" @edited="update" @cancel="editing = false"></edit>
         <show v-else :question="question" @editing="editing = true"></show>
-    </v-layout>
+        <v-container v-if="question">
+            <replies :question="question"></replies>
+            <new-reply :question-slug="question.slug" @created="addReply"></new-reply>
+        </v-container>
+    </div>
 </template>
 
 <script>
     import Show from './Show'
     import Edit from './Edit'
+    import Replies from './reply/Index'
+    import NewReply from './reply/Create'
 
     export default {
-        components: { Show, Edit },
+        components: { Show, Edit, Replies, NewReply },
         data() {
             return {
                 question: null,
@@ -25,6 +31,9 @@
                     }
                 }
                 this.editing = false
+            },
+            addReply(payload) {
+                this.question.replies.unshift(payload)
             }
         },
         async created() {

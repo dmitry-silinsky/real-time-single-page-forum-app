@@ -35,6 +35,7 @@ class QuestionResource extends JsonResource
                 'id' => $this->resource->category->id,
                 'name' => $this->resource->category->name,
             ],
+            'replies' => ReplyResource::collection($this->resource->replies),
         ];
     }
 }
