@@ -25,7 +25,7 @@ class ReplyController extends Controller
      */
     public function index(Question $question)
     {
-        $replies = $question->replies()->latest()->get();
+        $replies = $question->replies()->withCount('likes')->latest()->get();
 
         return ReplyResource::collection($replies);
     }

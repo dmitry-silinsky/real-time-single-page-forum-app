@@ -29,6 +29,8 @@ class ReplyResource extends JsonResource
                 'name' => $this->resource->user->name,
             ],
             'question_slug' => $this->resource->question->slug,
+            'likes_count' => $this->resource->likes->count(),
+            'liked' => $this->resource->likedByUser(auth()->user()),
         ];
     }
 }

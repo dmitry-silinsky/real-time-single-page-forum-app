@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
 class Reply extends Model
 {
     protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected $with = ['likes'];
 
     /**
      * @return Relations\BelongsTo
@@ -56,6 +57,15 @@ class Reply extends Model
     public function likes()
     {
         return $this->hasMany(Like::class);
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function likedByUser(User $user): bool
+    {
+        return (bool)$this->likes->where('user_id', $user->id)->count();
     }
 
     /**
