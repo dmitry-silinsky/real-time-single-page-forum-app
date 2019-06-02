@@ -3,6 +3,7 @@
 <!--        <v-toolbar-side-icon></v-toolbar-side-icon>-->
         <v-toolbar-title>Single Page Forum</v-toolbar-title>
         <v-spacer></v-spacer>
+        <app-notification v-if="loggedIn"></app-notification>
         <div class="hidden-sm-and-down">
             <router-link v-for="(item, i) in itemsByRole"
                          :key="i"
@@ -15,7 +16,10 @@
 </template>
 
 <script>
+    import AppNotification from './AppNotification'
+
     export default {
+        components: { AppNotification },
         data() {
             return {
                 items: [
@@ -28,6 +32,9 @@
             }
         },
         computed: {
+            loggedIn() {
+                return User.loggedIn()
+            },
             itemsByRole() {
                 return this.items.filter(item => {
                     if (item.admin && !User.isAdmin()) {

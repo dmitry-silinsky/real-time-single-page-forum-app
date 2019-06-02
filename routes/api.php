@@ -4,8 +4,16 @@ Route::apiResource('question', 'QuestionController');
 Route::apiResource('question.reply', 'ReplyController');
 Route::apiResource('category', 'CategoryController');
 
-Route::post('question/{question}/reply/{reply}/like', 'ReplyController@like')->name('question.reply.like');
-Route::delete('question/{question}/reply/{reply}/unlike', 'ReplyController@unlike')->name('question.reply.unlike');
+Route::group(['prefix' => 'question/{question}/reply/{reply}', 'as' => 'question.reply'], function () {
+    Route::post('like', 'ReplyController@like')->name('like');
+    Route::delete('unlike', 'ReplyController@unlike')->name('unlike');
+});
+
+Route::group(['prefix' => 'notification', 'as' => 'notification.'], function () {
+    Route::get('/', 'NotificationController@index')->name('index');
+    Route::post('{notification}/mark-as-read', 'NotificationController@markAsRead')
+        ->name('mark-as-read');
+});
 
 Route::group([
     'middleware' => 'api',

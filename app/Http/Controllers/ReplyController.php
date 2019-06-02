@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Replies\{CreateRequest, UpdateRequest};
 use App\Http\Resources\ReplyResource;
 use App\Models\{Question, Reply};
+use App\Notifications\Reply\NewReplyNotification;
 use Auth;
 use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -41,7 +42,12 @@ class ReplyController extends Controller
     {
         $data = array_merge($request->validated(), ['user_id' => Auth::id()]);
 
+        /** @var Reply $reply */
         $reply = $question->replies()->create($data);
+
+        if ($reply->user_id !== $question->user_id) {
+            $question->user->notify(new NewReplyNotification($reply));
+        }
 
         return new ReplyResource($reply);
     }
