@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DeleteReplyEvent;
+use App\Events\LikeEvent;
 use App\Http\Requests\Replies\{CreateRequest, UpdateRequest};
 use App\Http\Resources\ReplyResource;
 use App\Models\{Question, Reply};
@@ -98,6 +100,9 @@ class ReplyController extends Controller
 
         try {
             $reply->delete();
+
+            broadcast(new DeleteReplyEvent($reply->id))->toOthers();
+
             return response(null, Response::HTTP_NO_CONTENT);
         } catch (Exception $exception) {
             return response('Error while deleting', Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -116,6 +121,8 @@ class ReplyController extends Controller
 
         $reply->like(auth()->user());
 
+        broadcast(new LikeEvent($reply->id))->toOthers();
+
         return response(null, Response::HTTP_ACCEPTED);
     }
 
@@ -130,6 +137,8 @@ class ReplyController extends Controller
         $reply = $question->replies()->findOrFail($reply);
 
         $reply->unlike(auth()->user());
+
+        broadcast(new LikeEvent($reply->id, 'unlike'))->toOthers();
 
         return response(null, Response::HTTP_ACCEPTED);
     }

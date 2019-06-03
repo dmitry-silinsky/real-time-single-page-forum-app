@@ -48,6 +48,17 @@
                     }
                 }
             }
+        },
+        created() {
+            Echo.channel('like-channel').listen('LikeEvent', (e) => {
+                if (this.reply.id === e.replyId) {
+                    if (e.type === 'like') {
+                        this.count++
+                    } else {
+                        this.count--
+                    }
+                }
+            })
         }
     }
 </script>
