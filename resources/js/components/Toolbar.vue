@@ -1,14 +1,19 @@
 <template>
-    <v-toolbar>
+    <v-toolbar color="indigo" dark>
 <!--        <v-toolbar-side-icon></v-toolbar-side-icon>-->
-        <v-toolbar-title>Single Page Forum</v-toolbar-title>
+        <v-toolbar-title>
+            <router-link class="white--text link" to="/">
+                Single Page Forum
+            </router-link>
+        </v-toolbar-title>
         <v-spacer></v-spacer>
         <app-notification v-if="loggedIn"></app-notification>
         <div class="hidden-sm-and-down">
             <router-link v-for="(item, i) in itemsByRole"
                          :key="i"
                          :to="item.to"
-                         v-if="item.show">
+                         v-if="item.show"
+                         class="link">
                 <v-btn flat>{{ item.title }}</v-btn>
             </router-link>
         </div>
@@ -64,3 +69,9 @@
         }
     }
 </script>
+
+<style scoped>
+    .link {
+        text-decoration: none;
+    }
+</style>

@@ -54,6 +54,10 @@
                         console.log(e.response.data)
                     }
                 }
+            },
+            playSound() {
+                const alert = new Audio('/sounds/glass.mp3')
+                alert.play()
             }
         },
         created() {
@@ -64,7 +68,8 @@
             Echo.private(`App.Models.User.${User.id()}`).notification((notification) => {
                 this.unread.unshift(notification)
                 this.unreadCount++
+                this.playSound()
             })
-        }
+        },
     }
 </script>

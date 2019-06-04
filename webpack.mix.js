@@ -15,4 +15,5 @@ mix.setPublicPath('public/build')
    .setResourceRoot('/build/')
    .js('resources/js/app.js', 'js')
    .sass('resources/sass/app.scss', 'css')
+   .copy('resources/sounds', 'public/sounds', false)
    .version();

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
+import Parallax from './components/Parallax'
 import Login from './components/auth/Login'
 import Logout from './components/auth/Logout'
 import SignUp from './components/auth/SignUp'
@@ -12,6 +13,7 @@ import CreateQuestion from './components/forum/Create'
 import CreateCategory from './components/forum/category/Create'
 
 const routes = [
+    { path: '/', component: Parallax, name: 'home', meta: { auth: false } },
     { path: '/login', component: Login, name: 'login', meta: { auth: false } },
     { path: '/logout', component: Logout, name: 'logout', meta: { auth: true } },
     { path: '/signup', component: SignUp, name: 'signUp', meta: { auth: false } },
@@ -37,6 +39,10 @@ router.beforeEach((to, from, next) => {
     } else {
         next()
     }
+})
+
+router.afterEach((to, from) => {
+    EventBus.$emit('route-changed', {to: to})
 })
 
 export default router

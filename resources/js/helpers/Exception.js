@@ -8,7 +8,6 @@ class Exception {
         switch (error) {
             case 'Token is invalid':
             case 'Token is expired':
-                console.log('here')
                 User.logout()
                 break
         }
