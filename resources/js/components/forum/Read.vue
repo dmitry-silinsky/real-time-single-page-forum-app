@@ -4,7 +4,10 @@
         <show v-else :question="question" @editing="editing = true"></show>
         <v-container v-if="question">
             <replies :question="question"></replies>
-            <new-reply :question-slug="question.slug" @created="addReply"></new-reply>
+            <new-reply v-if="loggedIn" :question-slug="question.slug" @created="addReply"></new-reply>
+            <div v-else class="mt-4">
+                <router-link to="/login">Log in to Reply</router-link>
+            </div>
         </v-container>
     </div>
 </template>
@@ -23,6 +26,11 @@
                 editing: false
             }
         },
+        computed: {
+            loggedIn() {
+                return User.loggedIn()
+            }
+        },
         methods: {
             update(payload) {
                 for(let prop in payload) {
@@ -34,6 +42,7 @@
             },
             addReply(payload) {
                 this.question.replies.unshift(payload)
+                EventBus.$emit('reply-created', { slug: this.question.slug })
             }
         },
         async created() {

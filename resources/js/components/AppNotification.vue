@@ -40,9 +40,7 @@
                     this.unread = response.data.unread
                     this.unreadCount = response.data.unread.length
                 } catch (e) {
-                    if (e.reponse) {
-                        console.log(e.response)
-                    }
+                    Exception.handle(e)
                 }
             },
             async markAsRead(notification) {

@@ -1,24 +1,23 @@
 import Token from './Token'
 import AppStorage from './AppStorage'
+import Exception from "./Exception";
 
 class User {
-    login(payload) {
-        axios.post('/api/auth/login', payload)
-            .then(response => this.responseAfterLogin(response))
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data)
-                }
-            })
+    async login(payload) {
+        try {
+            const response = await axios.post('/api/auth/login', payload)
+            this.responseAfterLogin(response)
+        } catch(e) {
+            Exception.handle(e)
+        }
     }
-    signup(payload) {
-        axios.post('/api/auth/signUp', payload)
-            .then(response => this.responseAfterLogin(response))
-            .catch(error => {
-                if (error.response) {
-                    console.log(error.response.data)
-                }
-            })
+    async signup(payload) {
+        try {
+            const response = await axios.post('/api/auth/signUp', payload)
+            this.responseAfterLogin(response)
+        } catch (e) {
+            Exception.handle(e)
+        }
     }
     responseAfterLogin(response) {
         const token = response.data.access_token
@@ -30,7 +29,7 @@ class User {
     hasToken() {
         const storedToken = AppStorage.getToken()
         if (storedToken) {
-            return Token.isValid(storedToken)
+            return Token.isValid(storedToken) ? true : this.logout()
         }
         return false
     }

@@ -51,9 +51,9 @@
             login() {
                 this.$validator.validateAll().then(result => {
                     if (result) {
-                        User.login(this.form)
-                        EventBus.$emit('login')
-                        this.$router.push(this.routeAfterLogin)
+                        User.login(this.form).then(() => {
+                            this.$router.push(this.routeAfterLogin)
+                        })
                     }
                 })
             }

@@ -25,6 +25,7 @@
         methods: {
             removeReply(index) {
                 this.question.replies.splice(index, 1)
+                EventBus.$emit('reply-removed', { slug: this.question.slug })
             }
         },
         created() {

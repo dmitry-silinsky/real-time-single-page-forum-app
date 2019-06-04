@@ -11,8 +11,10 @@ Vue.use(VeeValidate)
 Vue.use(VueSimplemde)
 
 import User from './helpers/User'
+import Exception from './helpers/Exception'
 
 window.User = User
+window.Exception = Exception
 window.EventBus = new Vue()
 window.md = md
 

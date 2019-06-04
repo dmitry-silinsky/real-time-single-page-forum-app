@@ -9,7 +9,7 @@
                     <span class="grey--text">{{ question.user.name }} said {{ question.created_at }}</span>
                 </div>
                 <v-spacer></v-spacer>
-                <v-btn color="teal" dark>Replies: {{ question.replies.length }}</v-btn>
+                <v-btn color="teal" dark>Replies: {{ repliesCount }}</v-btn>
             </v-card-title>
             <v-card-text v-html="question.body"></v-card-text>
             <v-card-actions v-if="own">
@@ -27,6 +27,11 @@
 <script>
     export default {
         props: ['question'],
+        data() {
+            return {
+                repliesCount: 0
+            }
+        },
         computed: {
             own() {
                 return User.own(this.question.user.id)
@@ -43,6 +48,32 @@
                 } catch (e) {
                     console.log(e.response.data)
                 }
+            }
+        },
+        created() {
+            EventBus.$on('reply-created', (payload) => {
+                if (this.question.slug === payload.slug) {
+                    this.repliesCount++
+                }
+            })
+
+            Echo.private(`App.Models.User.${User.id()}`).notification((notification) => {
+                this.repliesCount++
+            })
+
+            EventBus.$on('reply-removed', (payload) => {
+                if (this.question.slug === payload.slug) {
+                    this.repliesCount--
+                }
+            })
+
+            Echo.channel('delete-reply-channel').listen('DeleteReplyEvent', (event) => {
+                this.repliesCount--
+            })
+        },
+        watch: {
+            question(value) {
+                this.repliesCount = value.replies.length
             }
         }
     }

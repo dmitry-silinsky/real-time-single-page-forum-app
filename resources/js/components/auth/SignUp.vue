@@ -53,22 +53,24 @@
                     name: null,
                     email: null,
                     password: null
-                }
+                },
+                routeAfterLogin: { name: 'forum.index' }
             }
         },
         methods: {
             signUp() {
                 this.$validator.validateAll().then(result => {
                     if (result) {
-                        User.signup(this.form)
-                        this.$router.push({name: 'forum.index'})
+                        User.signup(this.form).then(() => {
+                            this.$router.push(this.routeAfterLogin)
+                        })
                     }
                 })
             }
         },
         created() {
             if (User.loggedIn()) {
-                this.$router.push({name: 'forum.index'})
+                this.$router.push(this.routeAfterLogin)
             }
         }
     }
